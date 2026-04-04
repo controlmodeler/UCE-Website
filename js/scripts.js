@@ -1,6 +1,62 @@
 // ─── UCE Landing · scripts.js ───────────────────
 
 const THEME_KEY = 'uce-theme';
+
+function getSavedTheme() {
+  try {
+    const savedTheme = window.localStorage.getItem(THEME_KEY);
+    return savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveTheme(theme) {
+  try {
+    window.localStorage.setItem(THEME_KEY, theme);
+  } catch {
+    // Ignore storage failures and still allow in-session toggling.
+  }
+}
+
+function getSystemTheme() {
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+    return 'light';
+  }
+  return 'dark';
+}
+
+function applyTheme(theme, rootEl, toggleEl) {
+  rootEl.setAttribute('data-theme', theme);
+
+  if (!toggleEl) return;
+  const nextTheme = theme === 'dark' ? 'light' : 'dark';
+  toggleEl.setAttribute('aria-label', `Switch to ${nextTheme} mode`);
+  toggleEl.setAttribute('aria-pressed', String(theme === 'light'));
+}
+
+function initializeThemeToggle() {
+  const rootEl = document.documentElement;
+  const toggleEl = document.getElementById('themeToggle');
+  const initialTheme = getSavedTheme() || getSystemTheme();
+
+  applyTheme(initialTheme, rootEl, toggleEl);
+
+  if (!toggleEl) return;
+  toggleEl.addEventListener('click', () => {
+    const currentTheme = rootEl.getAttribute('data-theme') || 'dark';
+    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(nextTheme, rootEl, toggleEl);
+    saveTheme(nextTheme);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeThemeToggle);
+} else {
+  initializeThemeToggle();
+}
+
 const htmlEl = document.documentElement;
 
 function getSavedTheme() {
@@ -19,6 +75,8 @@ function applyTheme(theme, rootEl = htmlEl, toggleEl = document.getElementById('
 
   const iconEl = toggleEl.querySelector('.theme-toggle-icon');
   if (iconEl) iconEl.textContent = theme === 'light' ? '◑' : '◐';
+  const label = toggleEl.querySelector('.theme-toggle-label');
+  if (label) label.textContent = nextTheme === 'light' ? 'Light mode' : 'Dark mode';
 }
 
 function initializeThemeToggle() {
@@ -41,6 +99,12 @@ function initializeThemeToggle() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') syncToSystemTheme();
   });
+  const handleSystemThemeChange = () => {
+    if (!getSavedTheme()) applyTheme(getSystemTheme(), rootEl, toggleEl);
+  };
+
+  if (typeof mq.addEventListener === 'function') mq.addEventListener('change', handleSystemThemeChange);
+  else if (typeof mq.addListener === 'function') mq.addListener(handleSystemThemeChange);
 
   if (!toggleEl) return;
 
