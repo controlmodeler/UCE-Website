@@ -57,6 +57,37 @@ if (document.readyState === 'loading') {
   initializeThemeToggle();
 }
 
+const htmlEl = document.documentElement;
+const themeToggle = document.getElementById('themeToggle');
+
+function getPreferredTheme() {
+  const savedTheme = window.localStorage.getItem(THEME_KEY);
+  if (savedTheme === 'dark' || savedTheme === 'light') return savedTheme;
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+function applyTheme(theme) {
+  htmlEl.setAttribute('data-theme', theme);
+
+  if (!themeToggle) return;
+  const nextTheme = theme === 'dark' ? 'light' : 'dark';
+  themeToggle.setAttribute('aria-label', `Switch to ${nextTheme} mode`);
+  themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
+  const label = themeToggle.querySelector('.theme-toggle-label');
+  if (label) label.textContent = nextTheme === 'light' ? 'Light mode' : 'Dark mode';
+}
+
+applyTheme(getPreferredTheme());
+
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = htmlEl.getAttribute('data-theme') || 'dark';
+    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(nextTheme);
+    window.localStorage.setItem(THEME_KEY, nextTheme);
+  });
+}
+
 // Scroll-triggered reveals
 const revealEls = document.querySelectorAll(
   '.problem-card, .pipeline-step, .output-card, .audience-card, .provenance-strip, .position-desc, .audience-desc, .beta-title, .beta-desc, .beta-form, .quad-wrap'
