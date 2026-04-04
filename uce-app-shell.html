@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>UCE · ControlModeler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & Variables ─────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:         #0a0b0c;
+  --bg-2:       #0f1012;
+  --bg-3:       #141618;
+  --bg-4:       #1a1d20;
+  --bg-5:       #1f2326;
+  --border:     #1e2124;
+  --border-2:   #2a2e33;
+  --border-3:   #363b42;
+  --text:       #e8eaec;
+  --text-2:     #9aa0a8;
+  --text-3:     #5c6470;
+  --text-4:     #3a3f47;
+  --accent:     #f5a623;
+  --accent-dim: rgba(245,166,35,.1);
+  --accent-2:   #4af09a;
+  --a2dim:      rgba(74,240,154,.1);
+  --blue:       #4a9cf0;
+  --blue-dim:   rgba(74,156,240,.1);
+  --red:        #f05050;
+  --red-dim:    rgba(240,80,80,.1);
+  --warn:       #f5c842;
+  --warn-dim:   rgba(245,200,66,.1);
+  --mono:       'IBM Plex Mono',monospace;
+  --sans:       'IBM Plex Sans',sans-serif;
+  --sidebar-w:  224px;
+  --topbar-h:   48px;
+  --radius:     4px;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden}
+
+/* ─── Layout shell ──────────────────────────── */
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{
+  height:var(--topbar-h);flex-shrink:0;
+  background:var(--bg-2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px 0 0;z-index:50;
+}
+.body{display:flex;flex:1;overflow:hidden}
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--bg-2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.main{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column}
+.statusbar{
+  height:24px;flex-shrink:0;
+  background:var(--bg-3);border-top:1px solid var(--border);
+  display:flex;align-items:center;padding:0 16px;gap:16px;
+}
+
+/* ─── Topbar ────────────────────────────────── */
+.tb-brand{
+  display:flex;align-items:center;gap:0;
+  width:var(--sidebar-w);border-right:1px solid var(--border);
+  padding:0 14px;height:100%;flex-shrink:0;
+}
+.tb-logo-mark{color:var(--accent);font-size:12px;margin-right:8px}
+.tb-logo-text{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--text)}
+.tb-logo-sep{width:1px;height:16px;background:var(--border-2);margin:0 10px}
+.tb-logo-sub{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.04em}
+.tb-project{
+  display:flex;align-items:center;gap:10px;
+  padding:0 14px;flex:1;
+}
+.tb-project-label{font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:.04em}
+.tb-project-name{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  color:var(--text);background:var(--bg-3);
+  border:1px solid var(--border-2);border-radius:var(--radius);
+  padding:3px 10px;
+}
+.tb-project-badge{
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.08em;color:var(--accent-2);
+  background:var(--a2dim);border-radius:2px;padding:2px 7px;
+}
+.tb-actions{display:flex;align-items:center;gap:6px}
+.tb-btn{
+  font-family:var(--mono);font-size:11px;color:var(--text-2);
+  background:none;border:1px solid var(--border-2);border-radius:var(--radius);
+  padding:5px 10px;cursor:pointer;transition:color .15s,border-color .15s;
+}
+.tb-btn:hover{color:var(--text);border-color:var(--border-3)}
+.tb-btn.primary{color:var(--bg);background:var(--accent);border-color:var(--accent)}
+.tb-btn.primary:hover{opacity:.85}
+.tb-avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--accent-dim);border:1px solid var(--border-2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);
+  cursor:pointer;margin-left:4px;
+}
+
+/* ─── Sidebar ───────────────────────────────── */
+.sidebar-section{padding:8px 0;border-bottom:1px solid var(--border)}
+.sidebar-section:last-child{border-bottom:none;flex:1}
+.sidebar-label{
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-3);padding:6px 14px 4px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:9px;
+  padding:6px 14px;cursor:pointer;
+  border-left:2px solid transparent;
+  transition:background .12s,color .12s,border-color .12s;
+  color:var(--text-2);
+  text-decoration:none;
+}
+.nav-item:hover{background:var(--bg-3);color:var(--text)}
+.nav-item.active{
+  background:var(--accent-dim);color:var(--accent);
+  border-left-color:var(--accent);
+}
+.nav-item.active .nav-icon{color:var(--accent)}
+.nav-icon{
+  width:16px;height:16px;display:flex;align-items:center;justify-content:center;
+  font-size:13px;flex-shrink:0;color:var(--text-3);
+  font-family:var(--mono);
+}
+.nav-label{font-size:12px;letter-spacing:.01em}
+.nav-badge{
+  margin-left:auto;font-family:var(--mono);font-size:9px;
+  font-weight:700;letter-spacing:.06em;border-radius:2px;
+  padding:2px 5px;
+}
+.nav-badge.err{background:var(--red-dim);color:var(--red)}
+.nav-badge.ok{background:var(--a2dim);color:var(--accent-2)}
+.nav-badge.warn{background:var(--warn-dim);color:var(--warn)}
+.nav-badge.info{background:var(--blue-dim);color:var(--blue)}
+
+.sidebar-workspace{
+  padding:10px 14px;background:var(--bg-3);
+  border-bottom:1px solid var(--border);
+}
+.ws-path{
+  font-family:var(--mono);font-size:10px;color:var(--text-3);
+  margin-bottom:4px;letter-spacing:.03em;
+}
+.ws-name{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text);margin-bottom:6px}
+.ws-meta{display:flex;gap:6px;flex-wrap:wrap}
+.ws-chip{
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.06em;border-radius:2px;padding:2px 6px;
+  background:var(--bg-4);color:var(--text-3);border:1px solid var(--border-2);
+}
+
+/* ─── Main content ──────────────────────────── */
+.page{display:none;flex-direction:column;flex:1;animation:pageIn .2s ease}
+.page.active{display:flex}
+@keyframes pageIn{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:none}}
+
+.page-header{
+  padding:20px 28px 0;
+  border-bottom:1px solid var(--border);
+  background:var(--bg-2);
+  flex-shrink:0;
+}
+.ph-breadcrumb{
+  font-family:var(--mono);font-size:10px;color:var(--text-3);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;
+}
+.ph-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px}
+.ph-title{font-family:var(--sans);font-size:20px;font-weight:300;letter-spacing:-.01em;color:var(--text)}
+.ph-badges{display:flex;gap:6px;align-items:center;flex-shrink:0;padding-top:4px}
+.ph-badge{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;border-radius:2px;padding:3px 8px;
+}
+.ph-badge.ok   {background:var(--a2dim);color:var(--accent-2)}
+.ph-badge.err  {background:var(--red-dim);color:var(--red)}
+.ph-badge.warn {background:var(--warn-dim);color:var(--warn)}
+.ph-badge.info {background:var(--blue-dim);color:var(--blue)}
+.ph-badge.neutral{background:var(--bg-4);color:var(--text-3);border:1px solid var(--border-2)}
+.ph-desc{font-size:12px;color:var(--text-2);max-width:680px;line-height:1.55;padding-bottom:14px}
+.ph-tabs{display:flex;gap:0;margin-top:4px}
+.ph-tab{
+  font-family:var(--mono);font-size:11px;color:var(--text-3);
+  padding:8px 16px;border-bottom:2px solid transparent;
+  cursor:pointer;transition:color .15s,border-color .15s;letter-spacing:.03em;
+}
+.ph-tab:hover{color:var(--text-2)}
+.ph-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.page-body{flex:1;overflow-y:auto;padding:20px 28px;display:flex;flex-direction:column;gap:20px}
+
+/* ─── Sections ──────────────────────────────── */
+.section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;gap:12px;
+}
+.section-title-wrap{}
+.section-title{
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);
+}
+.section-caption{font-size:11px;color:var(--text-3);margin-top:2px}
+.section-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+
+/* ─── Status bar ────────────────────────────── */
+.sb-item{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:10px;color:var(--text-3);
+  letter-spacing:.04em;
+}
+.sb-dot{width:5px;height:5px;border-radius:50%}
+.sb-dot.ok{background:var(--accent-2)}
+.sb-dot.warn{background:var(--warn);animation:sbpulse 2s ease infinite}
+.sb-dot.err{background:var(--red)}
+@keyframes sbpulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sb-sep{width:1px;height:12px;background:var(--border-2)}
+
+/* ─── Component library ─────────────────────── */
+
+/* Cards row */
+.cards-row{display:grid;gap:1px;background:var(--border)}
+.cards-row.col-4{grid-template-columns:repeat(4,1fr)}
+.cards-row.col-3{grid-template-columns:repeat(3,1fr)}
+.cards-row.col-2{grid-template-columns:repeat(2,1fr)}
+.metric-card{
+  background:var(--bg-3);padding:16px 18px;
+}
+.mc-label{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.mc-value{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--text);letter-spacing:-.01em;line-height:1}
+.mc-value.ok{color:var(--accent-2)}
+.mc-value.err{color:var(--red)}
+.mc-value.warn{color:var(--warn)}
+.mc-sub{font-size:11px;color:var(--text-3);margin-top:4px}
+
+/* Command strip */
+.cmd-strip{
+  display:flex;gap:8px;align-items:stretch;
+  padding:12px 14px;
+  background:var(--bg-3);border:1px solid var(--border-2);border-radius:var(--radius);
+}
+.cmd-btn{
+  display:flex;flex-direction:column;gap:3px;
+  padding:8px 14px;background:var(--bg-4);
+  border:1px solid var(--border-2);border-radius:var(--radius);
+  cursor:pointer;transition:border-color .15s,background .15s;min-width:140px;
+}
+.cmd-btn:hover:not(:disabled){border-color:var(--accent);background:var(--accent-dim)}
+.cmd-btn:disabled{opacity:.35;cursor:default}
+.cmd-btn-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text);letter-spacing:.02em}
+.cmd-btn-cap{font-size:10px;color:var(--text-3)}
+.cmd-sep{width:1px;background:var(--border-2);margin:0 4px}
+
+/* State panel */
+.state-panel{
+  background:var(--bg-3);border:1px solid var(--border-2);
+  border-radius:var(--radius);padding:14px 16px;
+  border-left:3px solid var(--border-2);
+}
+.state-panel.ok{border-left-color:var(--accent-2)}
+.state-panel.err{border-left-color:var(--red)}
+.state-panel.warn{border-left-color:var(--warn)}
+.state-panel.info{border-left-color:var(--blue)}
+.sp-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.sp-label{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);letter-spacing:.02em}
+.sp-badge{
+  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.08em;
+  border-radius:2px;padding:2px 6px;margin-left:auto;
+}
+.sp-badge.ok{background:var(--a2dim);color:var(--accent-2)}
+.sp-badge.err{background:var(--red-dim);color:var(--red)}
+.sp-badge.warn{background:var(--warn-dim);color:var(--warn)}
+.sp-badge.info{background:var(--blue-dim);color:var(--blue)}
+.sp-msg{font-size:12px;color:var(--text-2);line-height:1.55}
+.sp-detail{font-size:11px;color:var(--text-3);margin-top:4px}
+
+/* Data table */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-3);padding:7px 12px;text-align:left;
+  border-bottom:1px solid var(--border-2);background:var(--bg-3);
+}
+.data-table td{
+  padding:7px 12px;border-bottom:1px solid var(--border);
+  color:var(--text-2);vertical-align:middle;
+}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg-3);color:var(--text)}
+.td-tag{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:500}
+.td-class{font-family:var(--mono);font-size:11px;color:var(--accent-2)}
+.td-code{font-family:var(--mono);font-size:11px;color:var(--text)}
+.td-badge{
+  display:inline-flex;font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.06em;border-radius:2px;padding:2px 6px;
+}
+.td-badge.ok{background:var(--a2dim);color:var(--accent-2)}
+.td-badge.err{background:var(--red-dim);color:var(--red)}
+.td-badge.warn{background:var(--warn-dim);color:var(--warn)}
+.td-badge.info{background:var(--blue-dim);color:var(--blue)}
+.td-badge.neutral{background:var(--bg-4);color:var(--text-3);border:1px solid var(--border-2)}
+.table-wrap{border:1px solid var(--border-2);border-radius:var(--radius);overflow:hidden}
+.table-wrap.scrollable{overflow-x:auto}
+
+/* Form elements */
+.form-grid{display:grid;gap:12px}
+.form-grid.col-2{grid-template-columns:1fr 1fr}
+.form-grid.col-3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase}
+.form-input,.form-select,.form-textarea{
+  background:var(--bg-3);border:1px solid var(--border-2);
+  border-radius:var(--radius);color:var(--text);
+  font-family:var(--sans);font-size:12px;padding:8px 10px;
+  outline:none;transition:border-color .15s;width:100%;
+}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text-4)}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+.form-select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%235c6470' stroke-width='1.5'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.form-select option{background:#1a1d20}
+.form-textarea{resize:vertical;min-height:80px}
+.form-submit{
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em;
+  color:var(--bg);background:var(--accent);border:none;border-radius:var(--radius);
+  padding:9px 20px;cursor:pointer;transition:opacity .15s;
+}
+.form-submit:hover{opacity:.85}
+
+/* Sequence steps */
+.seq-builder{display:flex;flex-direction:column;gap:2px}
+.seq-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;background:var(--bg-3);border:1px solid var(--border);
+  border-radius:var(--radius);cursor:default;
+  transition:border-color .15s;
+}
+.seq-row:hover{border-color:var(--border-2)}
+.seq-row.active-step{border-color:var(--accent);background:var(--accent-dim)}
+.seq-row.running{border-color:var(--accent-2);background:var(--a2dim)}
+.seq-row.neutral{opacity:.5}
+.sr-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--accent);min-width:24px}
+.sr-name{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);flex:1}
+.sr-phase{font-size:11px;color:var(--text-3)}
+.sr-actions{display:flex;gap:4px;margin-left:auto}
+.sr-btn{
+  font-family:var(--mono);font-size:10px;color:var(--text-3);
+  background:none;border:1px solid var(--border-2);border-radius:2px;
+  padding:3px 7px;cursor:pointer;transition:color .12s,border-color .12s;
+}
+.sr-btn:hover{color:var(--text);border-color:var(--border-3)}
+
+/* Finding cards */
+.finding-card{
+  border-radius:var(--radius);border:1px solid var(--border-2);
+  border-left-width:3px;padding:12px 14px;background:var(--bg-3);
+}
+.finding-card.err{border-left-color:var(--red);background:var(--red-dim)}
+.finding-card.warn{border-left-color:var(--warn);background:var(--warn-dim)}
+.finding-card.info{border-left-color:var(--blue);background:var(--blue-dim)}
+.fc-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.fc-code{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text)}
+.fc-sev{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;border-radius:2px;padding:2px 6px}
+.fc-sev.err{background:var(--red);color:#fff}
+.fc-sev.warn{background:var(--warn);color:#0a0b0c}
+.fc-sev.info{background:var(--blue);color:#fff}
+.fc-msg{font-size:12px;color:var(--text-2);line-height:1.55;margin-bottom:4px}
+.fc-ref{font-family:var(--mono);font-size:10px;color:var(--text-3)}
+
+/* Readiness banner */
+.readiness-banner{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;background:var(--bg-3);
+  border:1px solid var(--border-2);border-radius:var(--radius);
+}
+.rb-icon{font-size:16px;flex-shrink:0}
+.rb-text{flex:1}
+.rb-title{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px}
+.rb-msg{font-size:11px;color:var(--text-2)}
+.rb-action{font-family:var(--mono);font-size:10px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:var(--radius);padding:5px 12px;cursor:pointer;white-space:nowrap;transition:background .15s}
+.rb-action:hover{background:var(--accent-dim)}
+
+/* Interlock binding rows */
+.binding-table{display:flex;flex-direction:column;gap:1px}
+.binding-row-ui{
+  display:grid;grid-template-columns:90px 80px 1fr 100px;
+  align-items:center;gap:10px;padding:8px 12px;
+  background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius);
+}
+.binding-row-ui:hover{border-color:var(--border-2)}
+.br-from{font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:500}
+.br-type{
+  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.08em;
+  border-radius:2px;padding:2px 7px;text-align:center;
+}
+.br-type.trans{background:var(--blue-dim);color:var(--blue)}
+.br-type.intlk{background:var(--red-dim);color:var(--red)}
+.br-type.perm{background:var(--a2dim);color:var(--accent-2)}
+.br-logic{font-size:11px;color:var(--text-2)}
+.br-ref{font-family:var(--mono);font-size:10px;color:var(--text-3);text-align:right}
+
+/* Mermaid-style sequence diagram placeholder */
+.diagram-placeholder{
+  background:var(--bg-3);border:1px solid var(--border-2);border-radius:var(--radius);
+  padding:32px;display:flex;flex-direction:column;align-items:center;gap:20px;
+  font-family:var(--mono);
+}
+.dia-flow{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:320px}
+.dia-node{
+  background:var(--bg-4);border:1px solid var(--border-2);border-radius:3px;
+  padding:7px 20px;font-size:11px;font-weight:500;color:var(--text);
+  text-align:center;width:100%;
+}
+.dia-node.start{border-color:var(--accent-2);color:var(--accent-2);background:var(--a2dim)}
+.dia-node.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.dia-arrow{color:var(--text-3);font-size:11px;padding:3px 0}
+.dia-cond{
+  font-size:10px;color:var(--text-3);background:var(--bg-5);
+  border:1px dashed var(--border-2);border-radius:2px;padding:3px 10px;
+  max-width:240px;text-align:center;
+}
+
+/* Provenance chain */
+.prov-chain-ui{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  padding:10px 14px;background:var(--bg-3);
+  border:1px solid var(--border-2);border-radius:var(--radius);
+}
+.prov-key{font-family:var(--mono);font-size:10px;color:var(--text-3)}
+.prov-val{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-dim);padding:2px 8px;border-radius:2px}
+.prov-sep{color:var(--border-3);font-size:10px}
+
+/* Canonical tree */
+.canon-tree{display:flex;flex-direction:column;gap:1px}
+.tree-item{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 10px;border-radius:var(--radius);cursor:pointer;
+  color:var(--text-2);transition:background .12s,color .12s;
+}
+.tree-item:hover{background:var(--bg-3);color:var(--text)}
+.tree-item.selected{background:var(--accent-dim);color:var(--accent)}
+.tree-indent{width:16px;flex-shrink:0}
+.tree-icon{font-size:11px;flex-shrink:0;font-family:var(--mono);color:var(--text-3)}
+.tree-label{font-family:var(--mono);font-size:11px}
+.tree-count{font-family:var(--mono);font-size:10px;color:var(--text-3);margin-left:auto}
+
+/* Empty state */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px;color:var(--text-3);gap:10px;text-align:center;
+}
+.empty-icon{font-size:24px;opacity:.4}
+.empty-msg{font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--border-3)}
+
+/* Divider */
+.divider{height:1px;background:var(--border);margin:4px 0}
+
+/* Two-col layout */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.col-panel{display:flex;flex-direction:column;gap:12px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Topbar ───────────────────────────── -->
+  <div class="topbar">
+    <div class="tb-brand">
+      <span class="tb-logo-mark">◆</span>
+      <span class="tb-logo-text">UCE</span>
+      <div class="tb-logo-sep"></div>
+      <span class="tb-logo-sub">ControlModeler</span>
+    </div>
+    <div class="tb-project">
+      <span class="tb-project-label">PROJECT</span>
+      <span class="tb-project-name">pump_skid_rev3</span>
+      <span class="tb-project-badge">v2 · validated</span>
+    </div>
+    <div class="tb-actions">
+      <button class="tb-btn" onclick="switchPage('validation')">Run Validation</button>
+      <button class="tb-btn primary" onclick="switchPage('review')">Build &amp; Export</button>
+      <div class="tb-avatar">A</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- ── Sidebar ─────────────────────────── -->
+    <div class="sidebar">
+      <div class="sidebar-workspace">
+        <div class="ws-path">projects/pump_skid_rev3/</div>
+        <div class="ws-name">Pump Skid Package A</div>
+        <div class="ws-meta">
+          <span class="ws-chip">schema v2</span>
+          <span class="ws-chip">rev 3</span>
+          <span class="ws-chip">3 modules</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Workspace</div>
+        <a class="nav-item" onclick="switchPage('workspace')">
+          <span class="nav-icon">⬡</span>
+          <span class="nav-label">Workspace</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Registries</div>
+        <a class="nav-item" onclick="switchPage('inputs')">
+          <span class="nav-icon">≡</span>
+          <span class="nav-label">Inputs &amp; Devices</span>
+          <span class="nav-badge ok">47</span>
+        </a>
+        <a class="nav-item" onclick="switchPage('controlmodeler')">
+          <span class="nav-icon">◈</span>
+          <span class="nav-label">ControlModeler</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Authoring</div>
+        <a class="nav-item active" onclick="switchPage('sequence')">
+          <span class="nav-icon">▷</span>
+          <span class="nav-label">Sequence Builder</span>
+          <span class="nav-badge info">3 seq</span>
+        </a>
+        <a class="nav-item" onclick="switchPage('transitions')">
+          <span class="nav-icon">⇢</span>
+          <span class="nav-label">Transitions</span>
+          <span class="nav-badge warn">2 open</span>
+        </a>
+        <a class="nav-item" onclick="switchPage('interlocks')">
+          <span class="nav-icon">⊛</span>
+          <span class="nav-label">Interlocks &amp; Timers</span>
+          <span class="nav-badge err">1 err</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Build &amp; Review</div>
+        <a class="nav-item" onclick="switchPage('validation')">
+          <span class="nav-icon">✓</span>
+          <span class="nav-label">Validation</span>
+          <span class="nav-badge err">2 err</span>
+        </a>
+        <a class="nav-item" onclick="switchPage('review')">
+          <span class="nav-icon">↗</span>
+          <span class="nav-label">Review &amp; Export</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Inspect</div>
+        <a class="nav-item" onclick="switchPage('canonical')">
+          <span class="nav-icon">⊞</span>
+          <span class="nav-label">Canonical Explorer</span>
+        </a>
+        <a class="nav-item" onclick="switchPage('diff')">
+          <span class="nav-icon">⊟</span>
+          <span class="nav-label">Diff &amp; Provenance</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- ── Main area ───────────────────────── -->
+    <div class="main">
+
+      <!-- PAGE: Sequence Builder -->
+      <div class="page active" id="page-sequence">
+        <div class="page-header">
+          <div class="ph-breadcrumb">Authoring · Sequence Builder</div>
+          <div class="ph-title-row">
+            <div class="ph-title">Sequence Builder</div>
+            <div class="ph-badges">
+              <span class="ph-badge info">3 sequences</span>
+              <span class="ph-badge ok">draft saved</span>
+            </div>
+          </div>
+          <div class="ph-desc">Author and preview sequence phases and steps. Canonical compilation happens through the backend seam — draft state here does not modify canonical truth directly.</div>
+          <div class="ph-tabs">
+            <div class="ph-tab active">SEQ-001 · Startup</div>
+            <div class="ph-tab">SEQ-002 · Normal Op</div>
+            <div class="ph-tab">SEQ-003 · Shutdown</div>
+            <div class="ph-tab" style="margin-left:auto;color:var(--accent);border-bottom-color:var(--accent)">+ New sequence</div>
+          </div>
+        </div>
+        <div class="page-body">
+
+          <div class="two-col">
+            <div class="col-panel">
+              <div class="section-head">
+                <div class="section-title-wrap">
+                  <div class="section-title">Steps · SEQ-001</div>
+                  <div class="section-caption">6 steps · 1 timer defined</div>
+                </div>
+                <div class="section-actions">
+                  <button class="tb-btn">+ Add step</button>
+                </div>
+              </div>
+              <div class="seq-builder">
+                <div class="seq-row neutral">
+                  <span class="sr-num">S0</span>
+                  <span class="sr-name">NEUTRAL</span>
+                  <span class="sr-phase">entry / default</span>
+                  <div class="sr-actions"><button class="sr-btn">edit</button></div>
+                </div>
+                <div class="seq-row">
+                  <span class="sr-num">S1</span>
+                  <span class="sr-name">PRE-START CHECKS</span>
+                  <span class="sr-phase">verify</span>
+                  <div class="sr-actions"><button class="sr-btn">edit</button><button class="sr-btn">↑</button><button class="sr-btn">↓</button></div>
+                </div>
+                <div class="seq-row">
+                  <span class="sr-num">S2</span>
+                  <span class="sr-name">VALVE POSITIONING</span>
+                  <span class="sr-phase">prepare</span>
+                  <div class="sr-actions"><button class="sr-btn">edit</button><button class="sr-btn">↑</button><button class="sr-btn">↓</button></div>
+                </div>
+                <div class="seq-row active-step">
+                  <span class="sr-num">S3</span>
+                  <span class="sr-name">PUMP START</span>
+                  <span class="sr-phase">execute</span>
+                  <div class="sr-actions"><button class="sr-btn">edit</button><button class="sr-btn">↑</button><button class="sr-btn">↓</button></div>
+                </div>
+                <div class="seq-row">
+                  <span class="sr-num">S4</span>
+                  <span class="sr-name">FLOW ESTABLISH</span>
+                  <span class="sr-phase">confirm</span>
+                  <div class="sr-actions"><button class="sr-btn">edit</button><button class="sr-btn">↑</button><button class="sr-btn">↓</button></div>
+                </div>
+                <div class="seq-row running">
+                  <span class="sr-num">S5</span>
+                  <span class="sr-name">RUNNING</span>
+                  <span class="sr-phase">normal</span>
+                  <div class="sr-actions"><button class="sr-btn">edit</button></div>
+                </div>
+              </div>
+
+              <div style="margin-top:4px">
+                <div class="section-head" style="margin-bottom:8px">
+                  <div class="section-title-wrap"><div class="section-title">Timers</div></div>
+                  <button class="tb-btn">+ Timer</button>
+                </div>
+                <div class="state-panel info">
+                  <div class="sp-head">
+                    <span class="sp-label">TMR-001 · Start confirmation</span>
+                    <span class="sp-badge info">delay · 30 s</span>
+                  </div>
+                  <div class="sp-detail">scope: SEQ-001 · referenced by LGC-013</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-panel">
+              <div class="section-head">
+                <div class="section-title-wrap">
+                  <div class="section-title">Flow Preview</div>
+                  <div class="section-caption">Backend-derived sequence diagram</div>
+                </div>
+              </div>
+              <div class="diagram-placeholder">
+                <div class="dia-flow">
+                  <div class="dia-node">S0 · NEUTRAL</div>
+                  <div class="dia-arrow">↓</div>
+                  <div class="dia-node">S1 · PRE-START CHECKS</div>
+                  <div class="dia-arrow">↓</div>
+                  <div class="dia-cond">XV-101.open_fb AND FV-101 ≥ 10%</div>
+                  <div class="dia-arrow">↓</div>
+                  <div class="dia-node active">S3 · PUMP START ← active</div>
+                  <div class="dia-arrow">↓</div>
+                  <div class="dia-cond">P-101.run_fb AND TMR-001.elapsed</div>
+                  <div class="dia-arrow">↓</div>
+                  <div class="dia-node">S4 · FLOW ESTABLISH</div>
+                  <div class="dia-arrow">↓</div>
+                  <div class="dia-node start">S5 · RUNNING</div>
+                </div>
+              </div>
+
+              <div class="section-head" style="margin-top:4px">
+                <div class="section-title-wrap"><div class="section-title">Action Grid · S3</div></div>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>Device</th><th>Action</th><th>Type</th><th>Value</th></tr></thead>
+                  <tbody>
+                    <tr><td class="td-tag">P-101</td><td>START</td><td class="td-class">MOTOR</td><td>—</td></tr>
+                    <tr><td class="td-tag">FIC-101</td><td>MODE</td><td class="td-class">LOOP</td><td>AUTO</td></tr>
+                    <tr><td class="td-tag">FIC-101</td><td>SP</td><td class="td-class">LOOP</td><td>250 kg/h</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PAGE: Inputs & Devices -->
+      <div class="page" id="page-inputs">
+        <div class="page-header">
+          <div class="ph-breadcrumb">Registries · Inputs &amp; Devices</div>
+          <div class="ph-title-row">
+            <div class="ph-title">Inputs &amp; Device Registry</div>
+            <div class="ph-badges">
+              <span class="ph-badge ok">47 devices</span>
+              <span class="ph-badge ok">14 loops</span>
+            </div>
+          </div>
+          <div class="ph-desc">Author and manage the device registry. Devices, signals, and control loops are the canonical root — all sequences, interlocks, and logic reference these entities.</div>
+          <div class="ph-tabs">
+            <div class="ph-tab active">Devices</div>
+            <div class="ph-tab">Control Loops</div>
+            <div class="ph-tab">IO Summary</div>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="section-head">
+            <div class="section-title-wrap"><div class="section-title">Device Registry</div><div class="section-caption">47 devices across 3 modules</div></div>
+            <div class="section-actions">
+              <select class="form-select" style="width:140px;padding:5px 28px 5px 8px;font-size:11px">
+                <option>All classes</option><option>MOTOR</option><option>ONOFF_VALVE</option><option>TRANSMITTER</option>
+              </select>
+              <button class="tb-btn primary">+ Add device</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Tag</th><th>Class</th><th>Description</th><th>Area</th><th>P&amp;ID</th><th>Fail</th><th></th></tr></thead>
+              <tbody>
+                <tr><td class="td-tag">P-101</td><td class="td-class">MOTOR</td><td>Feed pump, Package A</td><td>A-01</td><td>DW-001</td><td>—</td><td><button class="sr-btn">edit</button></td></tr>
+                <tr><td class="td-tag">P-102</td><td class="td-class">MOTOR</td><td>Recirculation pump</td><td>A-01</td><td>DW-001</td><td>—</td><td><button class="sr-btn">edit</button></td></tr>
+                <tr><td class="td-tag">XV-101</td><td class="td-class">ONOFF_VALVE</td><td>Feed isolation valve</td><td>A-02</td><td>DW-002</td><td>CLOSE</td><td><button class="sr-btn">edit</button></td></tr>
+                <tr><td class="td-tag">FV-101</td><td class="td-class">CONTROL_VALVE</td><td>Feed flow control</td><td>A-02</td><td>DW-002</td><td>CLOSE</td><td><button class="sr-btn">edit</button></td></tr>
+                <tr><td class="td-tag">FT-101</td><td class="td-class">TRANSMITTER</td><td>Feed flow, 4–20 mA</td><td>A-02</td><td>DW-003</td><td>—</td><td><button class="sr-btn">edit</button></td></tr>
+                <tr><td class="td-tag">PT-101</td><td class="td-class">TRANSMITTER</td><td>Suction pressure</td><td>A-01</td><td>DW-003</td><td>—</td><td><button class="sr-btn">edit</button></td></tr>
+                <tr><td class="td-tag">LSH-101</td><td class="td-class">TRANSMITTER</td><td>Vessel high-level switch</td><td>A-03</td><td>DW-004</td><td>—</td><td><button class="sr-btn">edit</button></td></tr>
+                <tr><td class="td-tag">FIC-101</td><td class="td-class">CONTROLLER</td><td>Feed flow PID controller</td><td>A-02</td><td>DW-003</td><td>—</td><td><button class="sr-btn">edit</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Transitions -->
+      <div class="page" id="page-transitions">
+        <div class="page-header">
+          <div class="ph-breadcrumb">Authoring · Transitions</div>
+          <div class="ph-title-row">
+            <div class="ph-title">Transition Builder</div>
+            <div class="ph-badges">
+              <span class="ph-badge warn">2 unbound</span>
+              <span class="ph-badge ok">12 bound</span>
+            </div>
+          </div>
+          <div class="ph-desc">Author transition conditions connecting sequence steps. Clause authoring is structured — direct free-form logic is not supported. All clauses resolve to a logic_id in the Logic Registry.</div>
+          <div class="ph-tabs">
+            <div class="ph-tab active">SEQ-001 transitions</div>
+            <div class="ph-tab">SEQ-002 transitions</div>
+            <div class="ph-tab">SEQ-003 transitions</div>
+          </div>
+        </div>
+        <div class="page-body">
+          <div class="section-head">
+            <div class="section-title-wrap"><div class="section-title">Transition Bindings</div></div>
+            <button class="tb-btn primary">+ Add transition</button>
+          </div>
+          <div class="binding-table">
+            <div class="binding-row-ui">
+              <span class="br-from">S1 → S2</span>
+              <span class="br-type trans">TRANSITION</span>
+              <span class="br-logic">P-101.ready AND NOT ESD-001.active</span>
+              <span class="br-ref">LGC-011</span>
+            </div>
+            <div class="binding-row-ui">
+              <span class="br-from">S2 → S3</span>
+              <span class="br-type trans">TRANSITION</span>
+              <span class="br-logic">XV-101.open_fb AND FV-101.position ≥ 10%</span>
+              <span class="br-ref">LGC-012</span>
+            </div>
+            <div class="binding-row-ui" style="border-color:var(--warn)">
+              <span class="br-from">S3 → S4</span>
+              <span class="br-type trans">TRANSITION</span>
+              <span class="br-logic" style="color:var(--warn)">⚠ TMR-001 not in scope SEQ-001</span>
+              <span class="br-ref" style="color:var(--warn)">LGC-013</span>
+            </div>
+            <div class="binding-row-ui">
+              <span class="br-from">S4 → S5</span>
+              <span class="br-type trans">TRANSITION</span>
+              <span class="br-logic">FT-101.value ≥ 200 kg/h AND PT-101.value ≥ 80 kPa</span>
+              <span class="br-ref">LGC-014</span>
+            </div>
+          </div>
+
+          <div class="section-head" style="margin-top:4px">
+            <div class="section-title-wrap"><div class="section-title">Clause Editor · S3 → S4</div></div>
+          </div>
+          <div class="state-panel warn">
+            <div class="sp-head"><span class="sp-label">LGC-002 · Timer scope error</span><span class="sp-badge warn">WARNING</span></div>
+            <div class="sp-msg">TMR-001 is referenced in LGC-013 but is not defined within scope SEQ-001. Define the timer in the Sequence Builder before using it here.</div>
+          </div>
+          <div class="form-grid col-2" style="margin-top:8px">
+            <div class="form-group">
+              <label class="form-label">From step</label>
+              <select class="form-select"><option>S3 · PUMP START</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">To step</label>
+              <select class="form-select"><option>S4 · FLOW ESTABLISH</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Clause type</label>
+              <select class="form-select"><option>timer_elapsed</option><option>tag_state</option><option>analog_compare</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Timer reference</label>
+              <select class="form-select" style="border-color:var(--warn)"><option>TMR-001 (out of scope)</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Interlocks -->
+      <div class="page" id="page-interlocks">
+        <div class="page-header">
+          <div class="ph-breadcrumb">Authoring · Interlocks &amp; Timers</div>
+          <div class="ph-title-row">
+            <div class="ph-title">Interlocks &amp; Timers</div>
+            <div class="ph-badges">
+              <span class="ph-badge err">1 error</span>
+              <span class="ph-badge ok">7 valid</span>
+            </div>
+          </div>
+          <div class="ph-desc">Author interlocks and permissives against registered devices. Causes and effects reference Logic Registry entries. Timer mutation belongs in Sequence Builder.</div>
+        </div>
+        <div class="page-body">
+          <div class="two-col">
+            <div class="col-panel">
+              <div class="section-head">
+                <div class="section-title-wrap"><div class="section-title">Interlock Register</div></div>
+                <button class="tb-btn primary">+ Interlock</button>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead><tr><th>ID</th><th>Description</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr style="background:var(--red-dim)"><td class="td-code">INT-001</td><td>Low suction pressure trip</td><td><span class="td-badge err">ERROR</span></td></tr>
+                    <tr><td class="td-code">INT-002</td><td>High vessel level shutdown</td><td><span class="td-badge ok">VALID</span></td></tr>
+                    <tr><td class="td-code">INT-003</td><td>Motor overload protection</td><td><span class="td-badge ok">VALID</span></td></tr>
+                    <tr><td class="td-code">INT-004</td><td>Emergency stop</td><td><span class="td-badge ok">VALID</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="col-panel">
+              <div class="section-head">
+                <div class="section-title-wrap">
+                  <div class="section-title">INT-001 · Low suction pressure trip</div>
+                </div>
+              </div>
+              <div class="finding-card err">
+                <div class="fc-head"><span class="fc-code">INT-005</span><span class="fc-sev err">ERROR</span></div>
+                <div class="fc-msg">Effect references P-101 via direct device path. MOTOR class requires explicit STOP action or Control Module wrapping.</div>
+                <div class="fc-ref">entity: INT-001 · effect[0] · device: P-101</div>
+              </div>
+              <div class="section-head" style="margin-top:4px"><div class="section-title-wrap"><div class="section-title">Causes</div></div></div>
+              <div class="binding-table">
+                <div class="binding-row-ui">
+                  <span class="br-from">PT-101</span>
+                  <span class="br-type intlk">CAUSE</span>
+                  <span class="br-logic">PT-101.value &lt; 50 kPa · analog_compare</span>
+                  <span class="br-ref">LGC-020</span>
+                </div>
+              </div>
+              <div class="section-head" style="margin-top:8px"><div class="section-title-wrap"><div class="section-title">Effects</div></div></div>
+              <div class="binding-table">
+                <div class="binding-row-ui" style="border-color:var(--red)">
+                  <span class="br-from">P-101</span>
+                  <span class="br-type intlk">EFFECT</span>
+                  <span class="br-logic" style="color:var(--red)">STOP — missing action type</span>
+                  <span class="br-ref">—</span>
+                </div>
+                <div class="binding-row-ui">
+                  <span class="br-from">XV-101</span>
+                  <span class="br-type intlk">EFFECT</span>
+                  <span class="br-logic">CLOSE · ONOFF_VALVE</span>
+                  <span class="br-ref">LGC-021</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Validation -->
+      <div class="page" id="page-validation">
+        <div class="page-header">
+          <div class="ph-breadcrumb">Build &amp; Review · Validation</div>
+          <div class="ph-title-row">
+            <div class="ph-title">Validation</div>
+            <div class="ph-badges">
+              <span class="ph-badge err">2 errors</span>
+              <span class="ph-badge warn">1 warning</span>
+              <span class="ph-badge info">3 info</span>
+              <span class="ph-badge err">export blocked</span>
+            </div>
+          </div>
+          <div class="ph-desc">Compile drafts to canonical, run the validation engine, and review structured findings. Export is gated — validation must pass before any artifact is generated.</div>
+        </div>
+        <div class="page-body">
+          <div class="cmd-strip">
+            <button class="cmd-btn"><span class="cmd-btn-label">Compile to Canonical</span><span class="cmd-btn-cap">Current: draft pending</span></button>
+            <div class="cmd-sep"></div>
+            <button class="cmd-btn"><span class="cmd-btn-label">Run Validation</span><span class="cmd-btn-cap">Latest: 14 min ago</span></button>
+          </div>
+          <div class="readiness-banner" style="border-color:var(--red)">
+            <span class="rb-icon">✗</span>
+            <div class="rb-text">
+              <div class="rb-title">Export blocked · 2 errors must be resolved</div>
+              <div class="rb-msg">Fix INT-001 effect action type and SEQ-001 timer scope before building or exporting.</div>
+            </div>
+            <button class="rb-action" onclick="switchPage('interlocks')">Go to Interlocks →</button>
+          </div>
+          <div class="section-head">
+            <div class="section-title-wrap"><div class="section-title">Findings · 6 total</div></div>
+            <div class="section-actions">
+              <select class="form-select" style="width:110px;padding:5px 24px 5px 8px;font-size:11px"><option>All severities</option></select>
+              <input class="form-input" style="width:200px" placeholder="Search findings…"/>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="finding-card err">
+              <div class="fc-head"><span class="fc-code">INT-005</span><span class="fc-sev err">ERROR</span></div>
+              <div class="fc-msg">INT-001 effect[0] targets P-101 (MOTOR) without an explicit STOP action. Direct device path requires a typed action.</div>
+              <div class="fc-ref">entity: INT-001 · effect: P-101 · source: INTERLOCKS!C8</div>
+            </div>
+            <div class="finding-card err">
+              <div class="fc-head"><span class="fc-code">LGC-002</span><span class="fc-sev err">ERROR</span></div>
+              <div class="fc-msg">LGC-013 references TMR-001 but TMR-001 is not defined in scope SEQ-001.</div>
+              <div class="fc-ref">entity: Transition S3→S4 · logic_ref: LGC-013 · source: TRANSITIONS!B22</div>
+            </div>
+            <div class="finding-card warn">
+              <div class="fc-head"><span class="fc-code">SEQ-004</span><span class="fc-sev warn">WARNING</span></div>
+              <div class="fc-msg">Step S4 has no outbound transition defined. Step is a terminal state with no path to RUNNING.</div>
+              <div class="fc-ref">entity: SEQ-001 · step: S4 · source: SEQUENCES!D14</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Review & Export -->
+      <div class="page" id="page-review">
+        <div class="page-header">
+          <div class="ph-breadcrumb">Build &amp; Review · Review &amp; Export</div>
+          <div class="ph-title-row">
+            <div class="ph-title">Review &amp; Export</div>
+            <div class="ph-badges">
+              <span class="ph-badge ok">build ready</span>
+              <span class="ph-badge ok">validation passed</span>
+            </div>
+          </div>
+          <div class="ph-desc">Trigger build and export and inspect the generated artifact manifest. All artifacts are generated from the canonical model — no UI-owned engineering logic.</div>
+        </div>
+        <div class="page-body">
+          <div class="cmd-strip">
+            <button class="cmd-btn"><span class="cmd-btn-label">Compile to Canonical</span><span class="cmd-btn-cap">Current: compiled · 2 min ago</span></button>
+            <div class="cmd-sep"></div>
+            <button class="cmd-btn"><span class="cmd-btn-label">Build Project</span><span class="cmd-btn-cap">Latest: build_c91a447</span></button>
+            <div class="cmd-sep"></div>
+            <button class="cmd-btn" style="border-color:var(--accent)"><span class="cmd-btn-label" style="color:var(--accent)">Export Project</span><span class="cmd-btn-cap">5 artifact types</span></button>
+          </div>
+          <div class="readiness-banner" style="border-color:var(--accent-2)">
+            <span class="rb-icon" style="color:var(--accent-2)">✓</span>
+            <div class="rb-text">
+              <div class="rb-title" style="color:var(--accent-2)">Build ready · 0 errors · 0 warnings</div>
+              <div class="rb-msg">Canonical model is clean. All 5 export artifact types are registered and available.</div>
+            </div>
+          </div>
+          <div class="section-head">
+            <div class="section-title-wrap"><div class="section-title">Export Manifest · run_id: c91a447</div></div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Artifact</th><th>Type</th><th>Size</th><th>Hash</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>pump_skid_narrative.docx</td><td class="td-class">narrative</td><td>84 KB</td><td class="td-code" style="font-size:10px">e04c19ab</td><td><span class="td-badge ok">✓ generated</span></td></tr>
+                <tr><td>pump_skid_io_list.xlsx</td><td class="td-class">io_list</td><td>32 KB</td><td class="td-code" style="font-size:10px">f7a3b21c</td><td><span class="td-badge ok">✓ generated</span></td></tr>
+                <tr><td>pump_skid_cause_effect.xlsx</td><td class="td-class">cause_effect</td><td>18 KB</td><td class="td-code" style="font-size:10px">a19d4c88</td><td><span class="td-badge ok">✓ generated</span></td></tr>
+                <tr><td>pump_skid_interlock_register.xlsx</td><td class="td-class">interlock_reg</td><td>22 KB</td><td class="td-code" style="font-size:10px">b340ef12</td><td><span class="td-badge ok">✓ generated</span></td></tr>
+                <tr><td>pump_skid.drawio</td><td class="td-class">drawio</td><td>61 KB</td><td class="td-code" style="font-size:10px">9c02a77f</td><td><span class="td-badge ok">✓ generated</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="prov-chain-ui">
+            <span class="prov-key">run_id</span><span class="prov-val">c91a447</span>
+            <span class="prov-sep">·</span>
+            <span class="prov-key">input_hash</span><span class="prov-val">a3f9c12e</span>
+            <span class="prov-sep">·</span>
+            <span class="prov-key">canonical_hash</span><span class="prov-val">7d2b8f31</span>
+            <span class="prov-sep">·</span>
+            <span class="prov-key">validation_hash</span><span class="prov-val">55f10a99</span>
+            <span class="prov-sep">·</span>
+            <span class="prov-key">export_hash</span><span class="prov-val">e04c19ab</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Canonical Explorer -->
+      <div class="page" id="page-canonical">
+        <div class="page-header">
+          <div class="ph-breadcrumb">Inspect · Canonical Explorer</div>
+          <div class="ph-title-row">
+            <div class="ph-title">Canonical Explorer</div>
+            <div class="ph-badges"><span class="ph-badge info">read-only</span><span class="ph-badge ok">snapshot current</span></div>
+          </div>
+          <div class="ph-desc">Inspect the authoritative persisted canonical snapshot. This surface is read-only — canonical truth is backend-owned and cannot be edited here.</div>
+        </div>
+        <div class="page-body">
+          <div class="cards-row col-4">
+            <div class="metric-card"><div class="mc-label">Devices</div><div class="mc-value">47</div><div class="mc-sub">8 classes</div></div>
+            <div class="metric-card"><div class="mc-label">Sequences</div><div class="mc-value">3</div><div class="mc-sub">18 steps total</div></div>
+            <div class="metric-card"><div class="mc-label">Interlocks</div><div class="mc-value">8</div><div class="mc-sub">3 permissives</div></div>
+            <div class="metric-card"><div class="mc-label">Logic refs</div><div class="mc-value">34</div><div class="mc-sub">all resolved</div></div>
+          </div>
+          <div class="two-col">
+            <div class="col-panel">
+              <div class="section-head"><div class="section-title-wrap"><div class="section-title">Entity Navigator</div></div></div>
+              <div class="canon-tree">
+                <div class="tree-item selected"><span class="tree-icon">▸</span><span class="tree-label">Devices</span><span class="tree-count">47</span></div>
+                <div class="tree-item" style="padding-left:26px"><span class="tree-icon">·</span><span class="tree-label">P-101 · Feed pump</span></div>
+                <div class="tree-item" style="padding-left:26px"><span class="tree-icon">·</span><span class="tree-label">P-102 · Recirc pump</span></div>
+                <div class="tree-item" style="padding-left:26px"><span class="tree-icon">·</span><span class="tree-label">XV-101 · Feed isolation</span></div>
+                <div class="tree-item"><span class="tree-icon">▸</span><span class="tree-label">Sequences</span><span class="tree-count">3</span></div>
+                <div class="tree-item"><span class="tree-icon">▸</span><span class="tree-label">Control Loops</span><span class="tree-count">14</span></div>
+                <div class="tree-item"><span class="tree-icon">▸</span><span class="tree-label">Interlocks</span><span class="tree-count">8</span></div>
+                <div class="tree-item"><span class="tree-icon">▸</span><span class="tree-label">Logic Registry</span><span class="tree-count">34</span></div>
+                <div class="tree-item"><span class="tree-icon">▸</span><span class="tree-label">Tag Database</span><span class="tree-count">112</span></div>
+              </div>
+            </div>
+            <div class="col-panel">
+              <div class="section-head"><div class="section-title-wrap"><div class="section-title">Details · P-101</div></div></div>
+              <div class="state-panel info">
+                <div class="sp-head"><span class="sp-label">P-101 · Feed pump, Package A</span><span class="sp-badge info">MOTOR</span></div>
+                <div class="sp-detail">device_id: dev_p101 · stable since canonical v2 · module: PKG-A</div>
+              </div>
+              <div class="table-wrap" style="margin-top:8px">
+                <table class="data-table">
+                  <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                  <tbody>
+                    <tr><td>device_tag</td><td class="td-tag">P-101</td></tr>
+                    <tr><td>device_class</td><td class="td-class">MOTOR</td></tr>
+                    <tr><td>description</td><td>Feed pump, Package A</td></tr>
+                    <tr><td>area</td><td>A-01</td></tr>
+                    <tr><td>pid_sheet</td><td>DW-001</td></tr>
+                    <tr><td>signals</td><td class="td-code">RUN_CMD · RUN_FB · FAULT · READY</td></tr>
+                    <tr><td>used in</td><td>SEQ-001 S3, INT-001, INT-003</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Diff & Provenance -->
+      <div class="page" id="page-diff">
+        <div class="page-header">
+          <div class="ph-breadcrumb">Inspect · Diff &amp; Provenance</div>
+          <div class="ph-title-row">
+            <div class="ph-title">Diff &amp; Provenance</div>
+            <div class="ph-badges"><span class="ph-badge info">read-only</span></div>
+          </div>
+          <div class="ph-desc">Read-only visibility over persisted baseline comparison outputs, run provenance, and artifact lineage. No UI-side differencing is performed here.</div>
+        </div>
+        <div class="page-body">
+          <div class="cards-row col-4">
+            <div class="metric-card"><div class="mc-label">Changed entities</div><div class="mc-value warn">7</div><div class="mc-sub">vs rev 2 baseline</div></div>
+            <div class="metric-card"><div class="mc-label">Added</div><div class="mc-value ok">3</div></div>
+            <div class="metric-card"><div class="mc-label">Modified</div><div class="mc-value warn">4</div></div>
+            <div class="metric-card"><div class="mc-label">Removed</div><div class="mc-value">0</div></div>
+          </div>
+          <div class="prov-chain-ui">
+            <span class="prov-key">run_id</span><span class="prov-val">c91a447</span>
+            <span class="prov-sep">·</span>
+            <span class="prov-key">input_hash</span><span class="prov-val">a3f9c12e</span>
+            <span class="prov-sep">·</span>
+            <span class="prov-key">canonical_hash</span><span class="prov-val">7d2b8f31</span>
+            <span class="prov-sep">·</span>
+            <span class="prov-key">baseline</span><span class="prov-val">rev2_canonical</span>
+          </div>
+          <div class="section-head"><div class="section-title-wrap"><div class="section-title">Changed Entities</div></div></div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Entity</th><th>Type</th><th>Change</th><th>Impact</th></tr></thead>
+              <tbody>
+                <tr><td class="td-tag">FV-101</td><td class="td-class">CONTROL_VALVE</td><td><span class="td-badge warn">MODIFIED</span></td><td>fail position changed: OPEN → CLOSE</td></tr>
+                <tr><td class="td-tag">SEQ-001</td><td class="td-class">SEQUENCE</td><td><span class="td-badge warn">MODIFIED</span></td><td>step S4 added · transition S4→S5 added</td></tr>
+                <tr><td class="td-tag">INT-001</td><td class="td-class">INTERLOCK</td><td><span class="td-badge warn">MODIFIED</span></td><td>cause threshold changed: 30 kPa → 50 kPa</td></tr>
+                <tr><td class="td-tag">LSH-102</td><td class="td-class">TRANSMITTER</td><td><span class="td-badge ok">ADDED</span></td><td>new low-level switch</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: Workspace -->
+      <div class="page" id="page-workspace">
+        <div class="page-header">
+          <div class="ph-breadcrumb">Workspace</div>
+          <div class="ph-title-row">
+            <div class="ph-title">Workspace</div>
+            <div class="ph-badges"><span class="ph-badge ok">active</span></div>
+          </div>
+          <div class="ph-desc">Create or edit the active UCE project workspace. Workspace metadata is backend-owned. Project structure follows the canonical workspace contract.</div>
+        </div>
+        <div class="page-body">
+          <div class="cards-row col-3">
+            <div class="metric-card"><div class="mc-label">Project</div><div class="mc-value" style="font-size:16px">pump_skid_rev3</div><div class="mc-sub">schema v2 · rev 3</div></div>
+            <div class="metric-card"><div class="mc-label">Workspace path</div><div class="mc-value" style="font-size:12px;font-family:var(--mono)">projects/pump_skid/</div></div>
+            <div class="metric-card"><div class="mc-label">Last build</div><div class="mc-value ok" style="font-size:14px">run_id: c91a447</div><div class="mc-sub">14 min ago</div></div>
+          </div>
+          <div class="state-panel ok">
+            <div class="sp-head"><span class="sp-label">Workspace health: OK</span><span class="sp-badge ok">HEALTHY</span></div>
+            <div class="sp-msg">All required workspace directories are present. inputs/, canonical/, reports/, exports/, logs/ all verified.</div>
+          </div>
+          <div style="max-width:480px">
+            <div class="section-head"><div class="section-title-wrap"><div class="section-title">Edit Project Metadata</div></div></div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Project name</label><input class="form-input" value="Pump Skid Package A"/></div>
+              <div class="form-grid col-2">
+                <div class="form-group"><label class="form-label">Schema version</label><input class="form-input" value="v2"/></div>
+                <div class="form-group"><label class="form-label">Revision</label><input class="form-input" value="3"/></div>
+              </div>
+              <button class="form-submit" style="width:fit-content">Save metadata</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: ControlModeler -->
+      <div class="page" id="page-controlmodeler">
+        <div class="page-header">
+          <div class="ph-breadcrumb">Registries · ControlModeler</div>
+          <div class="ph-title-row">
+            <div class="ph-title">ControlModeler</div>
+            <div class="ph-badges"><span class="ph-badge info">read-only analysis</span></div>
+          </div>
+          <div class="ph-desc">Inspect backend-owned impact and sequence analysis reports. Trigger backend workflows through thin adapters — no engineering logic lives on this surface.</div>
+        </div>
+        <div class="page-body">
+          <div class="cards-row col-4">
+            <div class="metric-card"><div class="mc-label">Impact run</div><div class="mc-value ok" style="font-size:14px">completed</div><div class="mc-sub">7 changed entities</div></div>
+            <div class="metric-card"><div class="mc-label">Seq analysis</div><div class="mc-value ok" style="font-size:14px">completed</div><div class="mc-sub">3 sequences analyzed</div></div>
+            <div class="metric-card"><div class="mc-label">Reachable steps</div><div class="mc-value ok">18/18</div></div>
+            <div class="metric-card"><div class="mc-label">Dead ends</div><div class="mc-value ok">0</div></div>
+          </div>
+          <div class="cmd-strip">
+            <button class="cmd-btn"><span class="cmd-btn-label">Run Impact Analysis</span><span class="cmd-btn-cap">Latest: 14 min ago</span></button>
+            <div class="cmd-sep"></div>
+            <button class="cmd-btn"><span class="cmd-btn-label">Run Sequence Analysis</span><span class="cmd-btn-cap">Latest: 14 min ago</span></button>
+          </div>
+          <div class="state-panel ok">
+            <div class="sp-head"><span class="sp-label">Sequence Analysis · All sequences reachable</span><span class="sp-badge ok">PASSED</span></div>
+            <div class="sp-msg">SEQ-001 (6 steps), SEQ-002 (4 steps), SEQ-003 (8 steps) — all steps reachable, no dead ends, no cycles detected.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /body -->
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <div class="sb-item"><span class="sb-dot ok"></span>Backend connected</div>
+    <div class="sb-sep"></div>
+    <div class="sb-item"><span class="sb-dot warn"></span>2 validation errors</div>
+    <div class="sb-sep"></div>
+    <div class="sb-item">run_id: c91a447</div>
+    <div class="sb-sep"></div>
+    <div class="sb-item">UCE v2.4.1</div>
+    <div style="margin-left:auto" class="sb-item">pump_skid_rev3 · schema v2</div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  // match nav
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) {
+      n.classList.add('active');
+    }
+  });
+  // scroll to top
+  const main = document.querySelector('.main');
+  if (main) main.scrollTop = 0;
+}
+// tab switching within pages
+document.querySelectorAll('.ph-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    const tabs = this.closest('.ph-tabs').querySelectorAll('.ph-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
