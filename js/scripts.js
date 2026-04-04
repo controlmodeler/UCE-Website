@@ -2,35 +2,92 @@
 
 const THEME_KEY = 'uce-theme';
 const htmlEl = document.documentElement;
-const themeToggle = document.getElementById('themeToggle');
 
-function getPreferredTheme() {
+function getSavedTheme() {
   const savedTheme = window.localStorage.getItem(THEME_KEY);
-  if (savedTheme === 'dark' || savedTheme === 'light') return savedTheme;
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  return savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : null;
 }
 
-function applyTheme(theme) {
-  htmlEl.setAttribute('data-theme', theme);
+function applyTheme(theme, rootEl = htmlEl, toggleEl = document.getElementById('themeToggle')) {
+  rootEl.setAttribute('data-theme', theme);
 
-  if (!themeToggle) return;
+  if (!toggleEl) return;
+  toggleEl.setAttribute('title', 'Click to toggle theme. Double-click or long-press for Auto mode.');
   const nextTheme = theme === 'dark' ? 'light' : 'dark';
-  themeToggle.setAttribute('aria-label', `Switch to ${nextTheme} mode`);
-  themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
-  const label = themeToggle.querySelector('.theme-toggle-label');
-  if (label) label.textContent = nextTheme === 'light' ? 'Light mode' : 'Dark mode';
+  toggleEl.setAttribute('aria-label', `Switch to ${nextTheme} mode`);
+  toggleEl.setAttribute('aria-pressed', String(theme === 'light'));
+
+  const iconEl = toggleEl.querySelector('.theme-toggle-icon');
+  if (iconEl) iconEl.textContent = theme === 'light' ? '◑' : '◐';
 }
 
-applyTheme(getPreferredTheme());
+function initializeThemeToggle() {
+  const rootEl = document.documentElement;
+  const toggleEl = document.getElementById('themeToggle');
+  const mq = window.matchMedia('(prefers-color-scheme: light)');
+  const getSystemTheme = () => (mq.matches ? 'light' : 'dark');
 
-if (themeToggle) {
-  themeToggle.addEventListener('click', () => {
-    const currentTheme = htmlEl.getAttribute('data-theme') || 'dark';
+  const savedTheme = getSavedTheme();
+  applyTheme(savedTheme || getSystemTheme(), rootEl, toggleEl);
+
+  const syncToSystemTheme = () => {
+    if (!getSavedTheme()) applyTheme(getSystemTheme(), rootEl, toggleEl);
+  };
+
+  if (typeof mq.addEventListener === 'function') mq.addEventListener('change', syncToSystemTheme);
+  else if (typeof mq.addListener === 'function') mq.addListener(syncToSystemTheme);
+
+  window.addEventListener('pageshow', syncToSystemTheme);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') syncToSystemTheme();
+  });
+
+  if (!toggleEl) return;
+
+  const clearOverride = () => {
+    window.localStorage.removeItem(THEME_KEY);
+    applyTheme(getSystemTheme(), rootEl, toggleEl);
+  };
+
+  let longPressTimer = null;
+  let skipNextClick = false;
+  const LONG_PRESS_MS = 700;
+
+  const cancelLongPress = () => {
+    if (!longPressTimer) return;
+    window.clearTimeout(longPressTimer);
+    longPressTimer = null;
+  };
+
+  toggleEl.addEventListener('pointerdown', () => {
+    cancelLongPress();
+    longPressTimer = window.setTimeout(() => {
+      skipNextClick = true;
+      clearOverride();
+    }, LONG_PRESS_MS);
+  });
+
+  toggleEl.addEventListener('pointerup', cancelLongPress);
+  toggleEl.addEventListener('pointerleave', cancelLongPress);
+  toggleEl.addEventListener('pointercancel', cancelLongPress);
+  toggleEl.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    clearOverride();
+  });
+
+  toggleEl.addEventListener('click', () => {
+    if (skipNextClick) {
+      skipNextClick = false;
+      return;
+    }
+    const currentTheme = rootEl.getAttribute('data-theme') || 'dark';
     const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    applyTheme(nextTheme);
+    applyTheme(nextTheme, rootEl, toggleEl);
     window.localStorage.setItem(THEME_KEY, nextTheme);
   });
 }
+
+initializeThemeToggle();
 
 // Scroll-triggered reveals
 const revealEls = document.querySelectorAll(
