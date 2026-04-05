@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UCE — Universal Control Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/UCE-Website/css/styles.css" />
+</head>
+<body>
+  <!-- Grid overlay -->
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-mark">◆</span>
+        <span class="logo-text">UCE</span>
+        <span class="logo-sub">Universal Control Engine</span>
+        <span class="logo-by">by ControlModeler</span>
+      </div>
+      <nav class="nav">
+        <a href="#how-it-works" class="nav-link">How it works</a>
+        <a href="#outputs" class="nav-link">Outputs</a>
+        <a href="#beta" class="nav-link">Beta</a>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to light mode" aria-pressed="false">
+          <span class="theme-toggle-icon" aria-hidden="true">◐</span>
+        </button>
+        <a href="#beta" class="nav-cta">Request access</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-tag">
+        <span class="tag-dot"></span>
+        Engineering Compiler Platform
+      </div>
+
+      <h1 class="hero-title">
+        <span class="line line-1">Control system</span>
+        <span class="line line-2">design data,</span>
+        <span class="line line-3">compiled.</span>
+      </h1>
+
+      <p class="hero-desc">
+        UCE converts your engineering project into a validated model and consistent outputs — Control Narratives, IO lists, C&amp;E tables, Interlocks, and Logic Diagrams. Same input, same output. Every time.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#beta" class="btn-primary">Request beta access</a>
+        <a href="#how-it-works" class="btn-ghost">See how it works</a>
+      </div>
+
+      <div class="hero-stat-row">
+        <div class="stat">
+          <span class="stat-num">11</span>
+          <span class="stat-label">Engineering object types</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">100%</span>
+          <span class="stat-label">Vendor-neutral</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">DCS + PLC</span>
+          <span class="stat-label">Universal platform support</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terminal mockup -->
+    <div class="terminal-wrap">
+      <div class="terminal">
+        <div class="term-bar">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="term-title">uce project build</span>
+        </div>
+        <div class="term-body">
+          <div class="term-line"><span class="prompt">$</span> uce build --project ./pump-skid</div>
+          <div class="term-line dim">UCE v2.4.1 · ControlModeler Technologies</div>
+          <div class="term-line dim">────────────────────────────────────────</div>
+          <div class="term-line"><span class="kw">▶ Loading</span> pump-skid</div>
+          <div class="term-line">  <span class="ok">✓</span> Equipment and signals</div>
+          <div class="term-line">  <span class="ok">✓</span> Operational sequences</div>
+          <div class="term-line">  <span class="ok">✓</span> Safety and logic wiring</div>
+          <div class="term-line"><span class="kw">▶ Building</span></div>
+          <div class="term-line">  <span class="ok">✓</span> Project model ready</div>
+          <div class="term-line"><span class="kw">▶ Validating</span></div>
+          <div class="term-line">  <span class="ok">✓</span> 0 errors · 2 warnings · 14 info</div>
+          <div class="term-line"><span class="kw">▶ Generating</span></div>
+          <div class="term-line">  <span class="ok">✓</span> narrative.docx</div>
+          <div class="term-line">  <span class="ok">✓</span> io_list.xlsx</div>
+          <div class="term-line">  <span class="ok">✓</span> cause_effect.xlsx</div>
+          <div class="term-line">  <span class="ok">✓</span> interlocks.xlsx</div>
+          <div class="term-line">  <span class="ok">✓</span> logic_diagram.drawio</div>
+          <div class="term-line dim">────────────────────────────────────────</div>
+          <div class="term-line success">Done · 3.4s · run_id: b72f019</div>
+          <div class="term-cursor">█</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section class="problem" id="problem">
+    <div class="section-inner">
+      <div class="section-label">The problem</div>
+      <h2 class="section-title">Controls engineering runs on<br>fragmented, unvalidated documents.</h2>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-icon">⚠</div>
+          <h3>No single source of truth</h3>
+          <p>Control Narratives, IO lists, C&E tables, and interlocks are created in separate passes. They drift apart the moment a revision arrives.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">⚠</div>
+          <h3>No validation</h3>
+          <p>Unreachable sequence states, missing shutdown interlocks, and misassigned IO points survive to commissioning because nothing checks for them before delivery.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">⚠</div>
+          <h3>Platform lock-in</h3>
+          <p>Siemens copilots only work inside Siemens. Schneider tools only work inside EcoStruxure. The moment you touch a different DCS, you start over.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">⚠</div>
+          <h3>Manual, slow, expensive</h3>
+          <p>A senior engineer spends 3+ days per project producing deliverables that could be generated in hours from structured input. That time compounds across every project.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Engineering Workflow -->
+  <section class="engflow" id="workflow">
+    <div class="section-inner">
+      <div class="section-label">How you work in UCE</div>
+      <h2 class="section-title">One structured process.<br>All your engineering captured.</h2>
+      <p class="engflow-desc">UCE follows the same logic a controls engineer already uses — define your equipment, describe how it operates, wire your safety logic, check it, and generate outputs. No freeform documents. No disconnected tools.</p>
+      <div class="engflow-steps">
+        <div class="engflow-step">
+          <div class="engflow-num">01</div>
+          <div class="engflow-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h4M7 12h6"/></svg></div>
+          <h3>Define your equipment and signals</h3>
+          <p>Catalogue every device, instrument, signal, IO point, and control loop. UCE holds the single record — no duplicate lists across documents.</p>
+          <div class="engflow-examples">Motors · Valves · Transmitters · Analyzers · Control loops · IO points</div>
+        </div>
+        <div class="engflow-connector">→</div>
+        <div class="engflow-step">
+          <div class="engflow-num">02</div>
+          <div class="engflow-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <h3>Define your operational sequences</h3>
+          <p>Describe how the process moves — start-up phases, normal operation, shut-down, and hold states. UCE governs step order and sequence structure so nothing is missed.</p>
+          <div class="engflow-examples">Phases · Steps · Operating states · Timer-driven logic</div>
+        </div>
+        <div class="engflow-connector">→</div>
+        <div class="engflow-step">
+          <div class="engflow-num">03</div>
+          <div class="engflow-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+          <h3>Wire your safety and logic</h3>
+          <p>Connect interlocks, permissives, and state transitions to the equipment and sequences you've defined. Every condition is traceable back to a real engineering decision.</p>
+          <div class="engflow-examples">Interlocks · Permissives · State transitions · Control</div>
+        </div>
+        <div class="engflow-connector">→</div>
+        <div class="engflow-step">
+          <div class="engflow-num">04</div>
+          <div class="engflow-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <h3>Validate before you commit</h3>
+          <p>UCE checks your complete model — sequence reachability, interlock completeness, signal assignments. Catch errors in the model, not on the factory floor.</p>
+          <div class="engflow-examples">Reachability · Completeness · Consistency · Traceability</div>
+        </div>
+        <div class="engflow-connector">→</div>
+        <div class="engflow-step">
+          <div class="engflow-num">05</div>
+          <div class="engflow-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="12 18 8 14 12 10"/><line x1="16" y1="14" x2="8" y2="14"/></svg></div>
+          <h3>Generate all deliverables</h3>
+          <p>One build run produces every document your project needs — narratives, IO lists, interlocks, logic diagrams. Same input, same output, every revision.</p>
+          <div class="engflow-examples">Control Narrative · IO List · Interlocks · Logic Diagrams · C&amp;E Table</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how" id="how-it-works">
+    <div class="section-inner">
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">Author once.<br>Generate everything.</h2>
+
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h3>Your authored project</h3>
+            <p>Everything you've defined in UCE — equipment, signals, sequences, and safety logic — held in one structured workspace. No scattered spreadsheets. No manual assembly.</p>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h3>UCE builds your model</h3>
+            <p>UCE assembles your project into a single, vendor-neutral model — one source of truth for every deliverable that follows.</p>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h3>Your model, checked</h3>
+            <p>UCE validates the complete picture — sequence reachability, interlock completeness, signal assignments, cross-document consistency. Structured findings with codes and references.</p>
+          </div>
+        </div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h3>Your deliverables</h3>
+            <p>Every document your project needs, generated in one run. Same output — every revision, every time.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="provenance-strip">
+  <span class="prov-label">Full traceability on every build:</span>
+  <div class="prov-chain">
+    <span class="prov-item">run ID</span>
+    <span class="prov-sep">·</span>
+    <span class="prov-item">revision ID</span>
+    <span class="prov-sep">·</span>
+    <span class="prov-item">model version</span>
+    <span class="prov-sep">·</span>
+    <span class="prov-item">validation report</span>
+    <span class="prov-sep">·</span>
+    <span class="prov-item">export record</span>
+    <span class="prov-sep">·</span>
+    <span class="prov-item">uce version</span>
+  </div>
+</div>
+    </div>
+  </section>
+
+  <!-- Outputs -->
+  <section class="outputs" id="outputs">
+    <div class="section-inner">
+      <div class="section-label">Deliverables</div>
+      <h2 class="section-title">Every document your project needs,<br>generated from one input.</h2>
+
+      <div class="output-grid">
+        <div class="output-card">
+          <div class="output-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <h3>Control Narrative</h3>
+          <p>Structured Word document covering all sequences, interlocks, permissives, and control loops. Section order is template-driven and consistent.</p>
+          <div class="output-format">.docx</div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+          </div>
+          <h3>IO List</h3>
+          <p>Complete instrument index with usage cross-references across loops, sequences, interlocks, and permissives. Every signal accounted for.</p>
+          <div class="output-format">.xlsx</div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Interlocks &amp; C&amp;E Table</h3>
+          <p>Consolidated interlock and permissive list with conditions, actions, and bypass states — plus a machine-readable C&amp;E table generated directly from the interlock model. Ready for safety review.</p>
+          <div class="output-format">.xlsx</div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h3>Logic Diagrams</h3>
+          <p>Logic Diagrams of sequence flow, interlock logic, and IO routing — generated from the engineering model, not drawn by hand.</p>
+          <div class="output-format">.drawio</div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h3>Validation Report</h3>
+          <p>Structured findings with codes, severities, element references, and source hints. Traceable from report back to input, every time.</p>
+          <div class="output-format">.json</div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>DCS / PLC Exports <span class="output-badge">Near-term</span></h3>
+          <p>Tag database and I/O configuration files generated directly from your engineering model — ready to import into your control system.</p>
+          <div class="output-format">.csv / .xml</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Position -->
+  <section class="position">
+    <div class="section-inner">
+      <div class="section-label">Competitive position</div>
+      <h2 class="section-title">The only tool that is both<br>universal and deep.</h2>
+      <p class="position-desc">Siemens copilots work inside Siemens. Schneider copilots work inside EcoStruxure. They cannot build a universal tool — doing so would mean helping engineers choose competitor hardware. UCE has no such constraint.</p>
+
+      <div class="quad-wrap">
+        <div class="quad">
+          <div class="quad-axis quad-x">
+            <span>Vendor-locked</span>
+            <div class="axis-line"></div>
+            <span>Vendor-agnostic</span>
+          </div>
+          <div class="quad-axis quad-y">
+            <span>Deep engineering intent</span>
+            <div class="axis-line"></div>
+            <span>Shallow / document only</span>
+          </div>
+          <div class="quad-grid">
+            <div class="quad-cell top-left">
+              <span class="quad-label-small">Siemens / Schneider</span>
+              <span class="quad-label-small">Rockwell copilots</span>
+            </div>
+            <div class="quad-cell top-right uce-cell">
+              <span class="uce-marker">◆</span>
+              <span class="uce-label">UCE</span>
+              <span class="uce-sub">Only player here</span>
+            </div>
+            <div class="quad-cell bottom-left">
+              <span class="quad-label-small">AVEVA / Hexagon PPM</span>
+            </div>
+            <div class="quad-cell bottom-right">
+              <span class="quad-label-small">Excel + Word</span>
+              <span class="quad-label-small">Generic doc tools</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="position-compiler">Built like a compiler. Not a document tool. Your engineering project is the source. The deliverables are the output.</p>
+    </div>
+  </section>
+
+  <!-- Who it's for -->
+  <section class="audience">
+    <div class="section-inner">
+      <div class="section-label">Who it's for</div>
+      <h2 class="section-title">Built for teams where control deliverables never stop.</h2>
+      <p class="audience-desc">UCE is for the controls teams that produce this work every engagement — EPCs moving from project to project, integrators programming across platforms, vendors delivering the same logic to different sites. Every time, the problem is the same: documents that drift, logic rewritten from scratch, and deliverables that take longer than the engineering itself.</p>
+
+      <div class="audience-grid">
+        <div class="audience-card">
+          <div class="audience-icon">⚙</div>
+          <h3>Mid-size EPCs</h3>
+          <p>5–50 engineer teams producing control deliverables for process plants, utilities, and infrastructure. Priced out by AVEVA. Under-served by vendor tools. UCE fits.</p>
+        </div>
+        <div class="audience-card">
+          <div class="audience-icon">⚙</div>
+          <h3>System integrators</h3>
+          <p>Programming across multiple DCS and PLC platforms per year. UCE works across DCS and PLC platforms — define once, export to any target.</p>
+        </div>
+        <div class="audience-card">
+          <div class="audience-icon">⚙</div>
+          <h3>Packaged equipment vendors</h3>
+          <p>Skid vendors with repeatable logic that gets rewritten from scratch every project. UCE turns your standard packages into reusable standard modules.</p>
+        </div>
+        <div class="audience-card">
+          <div class="audience-icon">⚙</div>
+          <h3>Commercial automation builders</h3>
+          <p>Machine builders and panel shops delivering automated systems across multiple end users. Your standard control logic travels with the machine — authored once in UCE, not rewritten at every site.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Beta CTA -->
+  <section class="beta" id="beta">
+    <div class="section-inner">
+      <div class="beta-inner">
+        <div class="beta-tag">
+          <span class="tag-dot green-dot"></span>
+          Beta cohort open — 3–5 companies
+        </div>
+        <h2 class="beta-title">Run your next project<br>through UCE.</h2>
+        <p class="beta-desc">We're onboarding a small cohort of mid-size EPCs and integrators to run UCE on one real active project. Direct access to the team. Free through beta. First-mover pricing when we go paid.</p>
+
+        <form class="beta-form" id="betaForm" onsubmit="handleSubmit(event)">
+          <div class="form-row">
+            <input type="text" class="form-input" placeholder="Your name" required />
+            <input type="email" class="form-input" placeholder="Work email" required />
+          </div>
+          <div class="form-row">
+            <input type="text" class="form-input" placeholder="Company name" required />
+            <select class="form-input form-select" required>
+              <option value="" disabled selected>Team size</option>
+              <option>1–5 engineers</option>
+              <option>5–15 engineers</option>
+              <option>15–50 engineers</option>
+              <option>50+ engineers</option>
+            </select>
+          </div>
+          <textarea class="form-input form-textarea" placeholder="What platforms do you work with? (DCS/PLC vendors, project types)" rows="3"></textarea>
+          <button type="submit" class="btn-submit">Request access →</button>
+        </form>
+
+        <div class="beta-confirm" id="betaConfirm" style="display:none">
+          <div class="confirm-icon">✓</div>
+          <p>Request received. We'll be in touch directly within 2 business days.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="logo-mark">◆</span>
+        <div class="footer-brand-stack">
+          <span class="footer-brand-text">UCE · ControlModeler Technologies</span>
+          <span class="footer-brand-domain">controlmodeler.com</span>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="https://controlmodeler.com" class="footer-link">controlmodeler.com</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
+      <div class="footer-copy">© 2026 ControlModeler Technologies. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="/UCE-Website/js/scripts.js"></script>
+</body>
+</html>
